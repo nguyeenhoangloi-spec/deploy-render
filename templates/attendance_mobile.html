@@ -1,266 +1,865 @@
 <!doctype html>
-<html>
+<html lang="vi">
   <head>
     <meta charset="utf-8" />
-    <title>Điểm danh điện thoại</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Điểm danh Mobile - EduAttend</title>
     <style>
-      body {
-        font-family: sans-serif;
-        padding: 16px;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      .row {
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+        min-height: 100vh;
+        padding: 0;
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 16px;
+        padding-bottom: 32px;
+      }
+
+      .header {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e40af;
         margin-bottom: 12px;
       }
-      label {
-        display: block;
-        margin-bottom: 6px;
+
+      .session-info {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
       }
-      select,
-      input[type="number"],
-      button {
-        padding: 8px;
-        font-size: 15px;
-      }
-      video,
-      canvas {
-        max-width: 100%;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-      }
-      .note {
-        color: #666;
+
+      .info-badge {
+        background: #e0e7ff;
+        color: #1e40af;
+        padding: 6px 12px;
+        border-radius: 6px;
         font-size: 13px;
+        font-weight: 500;
       }
-      .ok {
-        color: #0a0;
+
+      .alert {
+        background: #fee;
+        border-left: 4px solid #f44;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        color: #c33;
+        font-size: 14px;
+        line-height: 1.6;
       }
-      .err {
-        color: #a00;
+
+      .alert strong {
+        font-weight: 700;
+      }
+
+      .tabs {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #666;
+        border: none;
+        background: transparent;
+      }
+
+      .tab.active {
+        background: #1e40af;
+        color: white;
+      }
+
+      .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #1e40af;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e0e7ff;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .form-group select,
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        background: white;
+      }
+
+      .form-group select:focus,
+      .form-group input:focus {
+        outline: none;
+        border-color: #1e40af;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: #1e40af;
+        color: white;
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+        background: #1e3a8a;
+      }
+
+      .btn-success {
+        background: #10b981;
+        color: white;
+      }
+
+      .btn-success:active {
+        background: #059669;
+        transform: scale(0.98);
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-danger:active {
+        background: #dc2626;
+        transform: scale(0.98);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .video-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+        background: #000;
+        aspect-ratio: 4/3;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 14px;
+        pointer-events: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .scanning-indicator {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #ef4444;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: none;
+        animation: pulse 1.5s infinite;
+      }
+
+      .scanning-indicator.active {
+        display: block;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      .result-box {
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .result-box.success {
+        background: #d1fae5;
+        border: 2px solid #10b981;
+        color: #065f46;
+      }
+
+      .result-box.error {
+        background: #fee2e2;
+        border: 2px solid #ef4444;
+        color: #991b1b;
+      }
+
+      .result-box.info {
+        border: 2px dashed #d1d5db;
+        color: #6b7280;
+      }
+
+      .message {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+      }
+
+      .message.visible {
+        display: block;
+      }
+
+      .message.success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #10b981;
+      }
+
+      .message.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+      }
+
+      .message.info {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #60a5fa;
+      }
+
+      .file-upload {
+        position: relative;
+        margin-bottom: 16px;
+      }
+
+      .file-upload input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+        border: 2px dashed #1e40af;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .file-upload-label:active {
+        background: #dbeafe;
+      }
+
+      .note {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+
+      canvas {
+        display: none;
+      }
+
+      /* Icons using emoji as fallback */
+      .icon {
+        font-size: 20px;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 12px;
+        }
+
+        .header h1 {
+          font-size: 20px;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+        }
+
+        .btn-group .btn {
+          width: 100%;
+        }
       }
     </style>
   </head>
-  <body>
-    <h2>Điểm danh bằng điện thoại</h2>
-    <p>Phiên ID: {{ session[0] }} | Trạng thái: {{ session[4] }}</p>
-    {% if not phone_enabled %}
-    <p class="note err">
-      Điểm danh bằng điện thoại đang TẮT trong Cấu hình. Vui lòng vào trang Cấu
-      hình bật "Cho phép điểm danh bằng điện thoại" rồi thử lại.
-    </p>
-    {% endif %}
+  <body
+    data-session-id="{{ session[0] }}"
+    data-phone-enabled="{{ 'true' if phone_enabled else 'false' }}"
+  >
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Điểm danh Mobile</h1>
+        <div class="session-info">
+          <div class="info-badge">Phiên: {{ session[7] }}</div>
+          <div class="info-badge">{{ session[4] }}</div>
+          <div class="info-badge">{{ session[6] }}</div>
+        </div>
+      </div>
 
-    <div class="row">
-      <label>Chọn sinh viên</label>
-      <select id="student">
-        {% for s in students %}
-        <option value="{{ s[0] }}">{{ s[2] }} ({{ s[1] }})</option>
-        {% endfor %}
-      </select>
+      <!-- Alert nếu tắt điểm danh phone -->
+      {% if not phone_enabled %}
+      <div class="alert">
+        <strong>Thông báo:</strong> Điểm danh bằng điện thoại đang bị TẮT. Vui
+        lòng vào trang Cấu hình và bật "Cho phép điểm danh bằng điện thoại".
+      </div>
+      {% endif %}
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="camera">Nhận diện Camera</button>
+        <button class="tab" data-tab="manual">Nhập thủ công</button>
+      </div>
+
+      <!-- Tab 1: Camera Recognition -->
+      <div class="tab-content active" id="camera-tab">
+        <div class="card">
+          <div class="card-title">Nhận diện tự động</div>
+
+          <p class="note">
+            Camera cần HTTPS trên điện thoại. Nếu không hoạt động, hãy dùng mục
+            "Chụp ảnh" bên dưới.
+          </p>
+
+          <div class="video-container">
+            <video id="video" autoplay playsinline></video>
+            <div class="scanning-indicator" id="scanIndicator">
+              Đang quét...
+            </div>
+            <div class="video-overlay" id="videoOverlay">
+              Đang khởi động camera...
+            </div>
+          </div>
+
+          <div class="result-box info" id="resultBox">
+            <div id="lastResult">Chưa có kết quả nhận diện</div>
+          </div>
+
+          <div class="btn-group">
+            <button
+              class="btn btn-success"
+              id="startScanBtn"
+              {%
+              if
+              not
+              phone_enabled
+              %}disabled{%
+              endif
+              %}
+            >
+              Bắt đầu quét
+            </button>
+            <button
+              class="btn btn-danger"
+              id="stopScanBtn"
+              {%
+              if
+              not
+              phone_enabled
+              %}disabled{%
+              endif
+              %}
+            >
+              Dừng lại
+            </button>
+          </div>
+
+          <div class="message" id="recMsg"></div>
+        </div>
+
+        <!-- Fallback: File Upload -->
+        <div class="card">
+          <div class="card-title">Chụp ảnh</div>
+
+          <p class="note">
+            Sử dụng khi camera không khả dụng hoặc gặp lỗi HTTPS.
+          </p>
+
+          <div class="file-upload">
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            />
+            <label class="file-upload-label" for="fileInput">
+              <span id="fileLabel">Nhấn để chụp ảnh</span>
+            </label>
+          </div>
+
+          <button
+            class="btn btn-primary"
+            id="sendFileBtn"
+            {%
+            if
+            not
+            phone_enabled
+            %}disabled{%
+            endif
+            %}
+          >
+            Gửi ảnh nhận diện
+          </button>
+
+          <div class="message" id="fileMsg"></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Manual Entry -->
+      <div class="tab-content" id="manual-tab">
+        <div class="card">
+          <div class="card-title">Điểm danh thủ công</div>
+
+          <div class="form-group">
+            <label for="student">Chọn sinh viên</label>
+            <select id="student">
+              {% for s in students %}
+              <option value="{{ s[0] }}">{{ s[2] }} ({{ s[1] }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Trạng thái</label>
+            <select id="status">
+              <option value="present">Có mặt</option>
+              <option value="late">Đi trễ</option>
+              <option value="absent">Vắng</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="submitBtn">Gửi điểm danh</button>
+
+          <div class="message" id="submitMsg"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-      <label>Trạng thái</label>
-      <select id="status">
-        <option value="present">Có mặt</option>
-        <option value="late">Đi trễ</option>
-        <option value="absent">Vắng</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <button id="submitBtn">Gửi điểm danh</button>
-      <span id="submitMsg" class="note"></span>
-    </div>
-
-    <hr />
-    <h3>Nhận diện bằng camera điện thoại (thử nghiệm)</h3>
-    <p class="note">
-      Trực tiếp mở camera cần HTTPS trên điện thoại (Chrome/Safari). Nếu không
-      mở được, dùng mục "Chụp ảnh" bên dưới để gửi ảnh nhận diện.
-    </p>
-    <div class="row">
-      <label>Kết quả gần nhất</label>
-      <div id="lastResult" class="note"></div>
-    </div>
-    <div class="row">
-      <video id="video" autoplay playsinline></video>
-    </div>
-    <div class="row">
-      <button id="startScanBtn" {% if not phone_enabled %}disabled{% endif %}>
-        Bật quét
-      </button>
-      <button
-        id="stopScanBtn"
-        {%
-        if
-        not
-        phone_enabled
-        %}disabled{%
-        endif
-        %}
-        style="margin-left: 8px"
-      >
-        Dừng
-      </button>
-      <span id="recMsg" class="note"></span>
-    </div>
-    <canvas id="canvas" style="display: none"></canvas>
-
-    <hr />
-    <h3>Chụp ảnh (fallback)</h3>
-    <p class="note">Dùng khi camera không mở do yêu cầu HTTPS.</p>
-    <div class="row">
-      <input
-        id="fileInput"
-        type="file"
-        accept="image/*"
-        capture="environment"
-      />
-      <button id="sendFileBtn">Gửi ảnh nhận diện</button>
-      <span id="fileMsg" class="note"></span>
-    </div>
+    <canvas id="canvas"></canvas>
 
     <script>
-      const sessionId = {{ session[0] }};
-      const submitBtn = document.getElementById('submitBtn');
-      const submitMsg = document.getElementById('submitMsg');
-      submitBtn.onclick = async () => {
-        const studentId = document.getElementById('student').value;
-        const status = document.getElementById('status').value;
-        submitMsg.textContent = 'Đang gửi...';
+      // ============================================================
+      // CONFIGURATION & INITIALIZATION
+      // ============================================================
+      const sessionId = Number(document.body.dataset.sessionId);
+      const phoneEnabled = document.body.dataset.phoneEnabled === "true";
+
+      // DOM Elements
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const videoOverlay = document.getElementById("videoOverlay");
+      const scanIndicator = document.getElementById("scanIndicator");
+      const lastResult = document.getElementById("lastResult");
+      const resultBox = document.getElementById("resultBox");
+      const recMsg = document.getElementById("recMsg");
+      const startScanBtn = document.getElementById("startScanBtn");
+      const stopScanBtn = document.getElementById("stopScanBtn");
+      const fileInput = document.getElementById("fileInput");
+      const sendFileBtn = document.getElementById("sendFileBtn");
+      const fileMsg = document.getElementById("fileMsg");
+      const submitBtn = document.getElementById("submitBtn");
+      const submitMsg = document.getElementById("submitMsg");
+
+      // ============================================================
+      // TAB SWITCHING
+      // ============================================================
+      const tabs = document.querySelectorAll(".tab");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Remove active class from all tabs and contents
+          tabs.forEach((t) => t.classList.remove("active"));
+          tabContents.forEach((tc) => tc.classList.remove("active"));
+
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add("active");
+          const tabName = tab.dataset.tab;
+          document.getElementById(tabName + "-tab").classList.add("active");
+
+          // Stop scanning when switching away from camera tab
+          if (tabName !== "camera" && scanning) {
+            stopScanBtn.click();
+          }
+        });
+      });
+
+      // ============================================================
+      // UTILITY FUNCTIONS
+      // ============================================================
+      function showMessage(element, text, type = "info") {
+        element.textContent = text;
+        element.className = `message visible ${type}`;
+        setTimeout(() => {
+          element.classList.remove("visible");
+        }, 5000);
+      }
+
+      function updateResultBox(text, type = "info") {
+        lastResult.textContent = text;
+        resultBox.className = `result-box ${type}`;
+      }
+
+      // ============================================================
+      // MANUAL ATTENDANCE SUBMISSION
+      // ============================================================
+      submitBtn.addEventListener("click", async () => {
+        const studentId = document.getElementById("student").value;
+        const status = document.getElementById("status").value;
+
+        showMessage(submitMsg, "⏳ Đang gửi...", "info");
+        submitBtn.disabled = true;
+
         try {
-          const r = await fetch('/attendance/api/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, student_id: studentId, status })
+          const r = await fetch("/attendance/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              session_id: sessionId,
+              student_id: studentId,
+              status,
+            }),
           });
           const j = await r.json();
-          submitMsg.textContent = j.status === 'ok' ? 'Đã gửi' : ('Lỗi: ' + (j.message||'unknown'));
-          submitMsg.className = j.status === 'ok' ? 'note ok' : 'note err';
-        } catch (e) {
-          submitMsg.textContent = 'Lỗi mạng'; submitMsg.className = 'note err';
-        }
-      };
 
-      // Camera access
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const recMsg = document.getElementById('recMsg');
-      const lastResult = document.getElementById('lastResult');
+          if (j.status === "ok") {
+            showMessage(
+              submitMsg,
+              "✅ Đã gửi điểm danh thành công!",
+              "success",
+            );
+          } else {
+            showMessage(
+              submitMsg,
+              "❌ Lỗi: " + (j.message || "unknown"),
+              "error",
+            );
+          }
+        } catch (e) {
+          showMessage(submitMsg, "❌ Lỗi mạng: " + e.message, "error");
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      // ============================================================
+      // CAMERA INITIALIZATION
+      // ============================================================
       async function initCamera() {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-              facingMode: 'environment',
+              facingMode: "environment",
               width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }
+              height: { ideal: 720 },
+            },
           });
           video.srcObject = stream;
+
+          // Hide overlay when video starts playing
+          video.addEventListener("loadedmetadata", () => {
+            videoOverlay.style.display = "none";
+          });
         } catch (e) {
-          recMsg.textContent = 'Không mở được camera: ' + e.message + ' — dùng mục Chụp ảnh (fallback)';
-          recMsg.className = 'note err';
+          videoOverlay.innerHTML =
+            "Lỗi camera: " + e.message + "<br>Vui lòng sử dụng 'Chụp ảnh'";
+          showMessage(
+            recMsg,
+            "Không thể mở camera. Vui lòng sử dụng tính năng 'Chụp ảnh' bên dưới.",
+            "error",
+          );
         }
       }
+
+      // Auto-init camera when page loads
       initCamera();
 
-      // Quét liên tục: chụp khung hình định kỳ và gửi lên nhận diện (không cần nút chụp)
+      // ============================================================
+      // CONTINUOUS SCANNING
+      // ============================================================
       let scanning = false;
-      const TARGET_W = 720; // giảm kích thước gửi để nhanh hơn
-      const JPEG_Q = 0.82;  // chất lượng ảnh gửi
-      const INTERVAL_MS = 400; // ~2.5 khung/giây
+      const TARGET_W = 720;
+      const JPEG_Q = 0.82;
+      const INTERVAL_MS = 400;
+
       async function scanOnce() {
-        if (!video.srcObject) { return; }
+        if (!video.srcObject) return;
+
         const vw = video.videoWidth || 640;
         const vh = video.videoHeight || 480;
-        const scale = vw > TARGET_W ? (TARGET_W / vw) : 1.0;
+        const scale = vw > TARGET_W ? TARGET_W / vw : 1.0;
         const tw = Math.max(1, Math.round(vw * scale));
         const th = Math.max(1, Math.round(vh * scale));
-        canvas.width = tw; canvas.height = th;
-        const ctx = canvas.getContext('2d');
+
+        canvas.width = tw;
+        canvas.height = th;
+
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(video, 0, 0, tw, th);
-        const dataUrl = canvas.toDataURL('image/jpeg', JPEG_Q);
+        const dataUrl = canvas.toDataURL("image/jpeg", JPEG_Q);
+
         try {
-          const r = await fetch('/attendance/api/recognize_submit', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, image: dataUrl })
+          const r = await fetch("/attendance/api/recognize_submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sessionId, image: dataUrl }),
           });
           const j = await r.json();
-          if (j.status === 'ok') {
+
+          if (j.status === "ok") {
             const arr = Array.isArray(j.results) ? j.results : [];
+
             if (arr.length > 0) {
-              const parts = arr.map(it => `${it.label} (${(it.confidence||0).toFixed(1)}%)`);
-              lastResult.textContent = parts.join(', ') + ' — đã gửi điểm danh';
-              lastResult.className = 'note ok';
+              const parts = arr.map(
+                (it) => `${it.label} (${(it.confidence || 0).toFixed(1)}%)`,
+              );
+              updateResultBox(
+                parts.join(", ") + " — Đã gửi điểm danh",
+                "success",
+              );
+            } else if (j.label && j.label !== "Unknown") {
+              updateResultBox(
+                `${j.label} — ${j.confidence.toFixed(1)}% (Đã gửi)`,
+                "success",
+              );
             } else {
-              // fallback to top-1 fields if provided
-              if (j.label && j.label !== 'Unknown') {
-                lastResult.textContent = `Nhãn: ${j.label} — ${j.confidence.toFixed(1)}% (đã gửi điểm danh)`;
-                lastResult.className = 'note ok';
-              } else {
-                lastResult.textContent = `Unknown`;
-                lastResult.className = 'note err';
-              }
+              updateResultBox("Không nhận diện được", "error");
             }
           } else {
-            lastResult.textContent = 'Lỗi: ' + (j.message||'unknown');
-            lastResult.className = 'note err';
+            updateResultBox("Lỗi: " + (j.message || "unknown"), "error");
           }
         } catch (e) {
-          lastResult.textContent = 'Lỗi mạng'; lastResult.className = 'note err';
+          updateResultBox("Lỗi mạng: " + e.message, "error");
         }
       }
+
       async function scanLoop() {
         if (!scanning) return;
         await scanOnce();
         setTimeout(scanLoop, INTERVAL_MS);
       }
-      startScanBtn.onclick = () => {
-        if (!video.srcObject) { recMsg.textContent = 'Camera chưa mở'; recMsg.className = 'note err'; return; }
-        if (scanning) { return; }
-        scanning = true; recMsg.textContent = 'Đang quét...'; recMsg.className = 'note';
-        scanLoop();
-      };
-      stopScanBtn.onclick = () => {
-        scanning = false; recMsg.textContent = 'Đã dừng quét'; recMsg.className = 'note';
-      };
 
-      // Fallback: upload captured image file
-      const fileInput = document.getElementById('fileInput');
-      const sendFileBtn = document.getElementById('sendFileBtn');
-      const fileMsg = document.getElementById('fileMsg');
-      sendFileBtn.onclick = async () => {
-        if (!{{ 'true' if phone_enabled else 'false' }}) { fileMsg.textContent = 'Phone attendance disabled'; fileMsg.className = 'note err'; return; }
+      startScanBtn.addEventListener("click", () => {
+        if (!video.srcObject) {
+          showMessage(recMsg, "Camera chưa sẵn sàng", "error");
+          return;
+        }
+        if (scanning) return;
+
+        scanning = true;
+        scanIndicator.classList.add("active");
+        startScanBtn.disabled = true;
+        stopScanBtn.disabled = false;
+        showMessage(recMsg, "Đang quét liên tục...", "info");
+        scanLoop();
+      });
+
+      stopScanBtn.addEventListener("click", () => {
+        scanning = false;
+        scanIndicator.classList.remove("active");
+        startScanBtn.disabled = false;
+        stopScanBtn.disabled = true;
+        showMessage(recMsg, "Đã dừng quét", "info");
+      });
+
+      // ============================================================
+      // FILE UPLOAD FALLBACK
+      // ============================================================
+      sendFileBtn.addEventListener("click", async () => {
+        if (!phoneEnabled) {
+          showMessage(fileMsg, "Điểm danh qua điện thoại đã bị tắt", "error");
+          return;
+        }
+
         const f = fileInput.files && fileInput.files[0];
-        if (!f) { fileMsg.textContent = 'Chưa chọn ảnh'; fileMsg.className = 'note err'; return; }
+        if (!f) {
+          showMessage(fileMsg, "Vui lòng chọn ảnh trước", "error");
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = async () => {
           const dataUrl = reader.result;
-          fileMsg.textContent = 'Đang nhận diện...';
+          showMessage(fileMsg, "Đang nhận diện...", "info");
+          sendFileBtn.disabled = true;
+
           try {
-            const r = await fetch('/attendance/api/recognize_submit', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ session_id: sessionId, image: dataUrl })
+            const r = await fetch("/attendance/api/recognize_submit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ session_id: sessionId, image: dataUrl }),
             });
             const j = await r.json();
-            if (j.status === 'ok') {
-              if (j.label && j.label !== 'Unknown') {
-                fileMsg.textContent = `Đã nhận diện: ${j.label} (độ tin cậy ${j.confidence.toFixed(1)}%)`;
-                fileMsg.className = 'note ok';
+
+            if (j.status === "ok") {
+              if (j.label && j.label !== "Unknown") {
+                showMessage(
+                  fileMsg,
+                  `Nhận diện: ${j.label} (${j.confidence.toFixed(1)}%)`,
+                  "success",
+                );
               } else {
-                fileMsg.textContent = `Không nhận diện được (độ tin cậy ${j.confidence?.toFixed?.(1) || 0}%)`;
-                fileMsg.className = 'note err';
+                showMessage(
+                  fileMsg,
+                  `Không nhận diện được (${j.confidence?.toFixed?.(1) || 0}%)`,
+                  "error",
+                );
               }
             } else {
-              fileMsg.textContent = 'Lỗi: ' + (j.message||'unknown');
-              fileMsg.className = 'note err';
+              showMessage(fileMsg, "Lỗi: " + (j.message || "unknown"), "error");
             }
           } catch (e) {
-            fileMsg.textContent = 'Lỗi mạng'; fileMsg.className = 'note err';
+            showMessage(fileMsg, "Lỗi mạng: " + e.message, "error");
+          } finally {
+            sendFileBtn.disabled = false;
           }
         };
         reader.readAsDataURL(f);
-      };
+      });
+
+      // Update file label when file is selected
+      fileInput.addEventListener("change", (e) => {
+        const fileName = e.target.files[0]?.name;
+        if (fileName) {
+          fileLabel.textContent = fileName;
+        } else {
+          fileLabel.textContent = "Nhấn để chụp ảnh";
+        }
+      });
     </script>
   </body>
 </html>

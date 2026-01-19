@@ -717,7 +717,7 @@ def mark_by_label(session_id):
 @attendance_bp.route("/mobile/<session_code>")
 def mobile_join(session_code):
     conn = get_connection(); cur = conn.cursor()
-    cur.execute("SELECT id, class_id, subject_id, session_date, status FROM attendance_sessions WHERE session_code=%s", (session_code,))
+    cur.execute("SELECT id, class_id, subject_id, session_date, time_slot, room, status, session_code FROM attendance_sessions WHERE session_code=%s", (session_code,))
     sess = cur.fetchone()
     if not sess:
         cur.close(); conn.close()

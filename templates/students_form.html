@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% if form.id %}Sửa sinh viên{% else %}Thêm sinh viên{% endif %} - EduAttend</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        max-width: 600px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      .form-group input[readonly] {
+        background: #f1f5f9;
+        cursor: not-allowed;
+      }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+      .btn-secondary {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e5e7eb;
+      }
+      .btn-secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+    
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">{% if form.id %}Sửa thông tin sinh viên{% else %}Thêm sinh viên mới{% endif %}</h2>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+        
+        <div class="form-card">
+          <form method="post">
+            <div class="form-group">
+              <label><i class="fas fa-id-card"></i> Mã sinh viên</label>
+              <input
+                name="student_code"
+                value="{{ form.student_code or '' }}"
+                placeholder="Có thể bỏ trống, hệ thống sẽ tự tạo"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Họ tên <span style="color: #ef4444;">*</span></label>
+              <input name="fullname" value="{{ form.fullname or '' }}" required />
+            </div>
+            
+            <div class="form-group">
+              <label><i class="fas fa-envelope"></i> Email</label>
+              <input
+                name="email"
+                type="email"
+                value="{{ form.email or '' }}"
+                placeholder="vd: nguyenvana@example.com"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label><i class="fas fa-phone"></i> Số điện thoại</label>
+              <input
+                name="phone"
+                type="tel"
+                value="{{ form.phone or '' }}"
+                placeholder="vd: 0901234567"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label><i class="fas fa-school"></i> Lớp học</label>
+              <select name="class_id">
+                <option value="">-- Chọn lớp --</option>
+                {% for c in classes %}
+                <option value="{{ c[0] }}" {% if form.class_id and (form.class_id == c[0] or form.class_id == (c[0] ~ '')) %}selected{% endif %}>
+                  {{ c[1] }} - {{ c[2] }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            {% if form.face_label %}
+            <div class="form-group">
+              <label><i class="fas fa-portrait"></i> Nhãn khuôn mặt</label>
+              <input value="{{ form.face_label }}" readonly />
+            </div>
+            {% endif %}
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if form.id %}Cập nhật{% else %}Thêm mới{% endif %}
+              </button>
+              <a href="{{ url_for('students.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Hủy
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+        <button type="submit" class="btn">Lưu</button>
+        <a href="{{ url_for('students.index') }}" class="btn secondary"
+          >Quay lại</a
+        >
+      </div>
+    </form>
+  </body>
+</html>

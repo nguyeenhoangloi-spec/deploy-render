@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Điểm danh điện thoại</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 16px;
+      }
+      .row {
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      select,
+      input[type="number"],
+      button {
+        padding: 8px;
+        font-size: 15px;
+      }
+      video,
+      canvas {
+        max-width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .note {
+        color: #666;
+        font-size: 13px;
+      }
+      .ok {
+        color: #0a0;
+      }
+      .err {
+        color: #a00;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Điểm danh bằng điện thoại</h2>
+    <p>Phiên ID: {{ session[0] }} | Trạng thái: {{ session[4] }}</p>
+    {% if not phone_enabled %}
+    <p class="note err">
+      Điểm danh bằng điện thoại đang TẮT trong Cấu hình. Vui lòng vào trang Cấu
+      hình bật "Cho phép điểm danh bằng điện thoại" rồi thử lại.
+    </p>
+    {% endif %}
+
+    <div class="row">
+      <label>Chọn sinh viên</label>
+      <select id="student">
+        {% for s in students %}
+        <option value="{{ s[0] }}">{{ s[2] }} ({{ s[1] }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="row">
+      <label>Trạng thái</label>
+      <select id="status">
+        <option value="present">Có mặt</option>
+        <option value="late">Đi trễ</option>
+        <option value="absent">Vắng</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <button id="submitBtn">Gửi điểm danh</button>
+      <span id="submitMsg" class="note"></span>
+    </div>
+
+    <hr />
+    <h3>Nhận diện bằng camera điện thoại (thử nghiệm)</h3>
+    <p class="note">
+      Trực tiếp mở camera cần HTTPS trên điện thoại (Chrome/Safari). Nếu không
+      mở được, dùng mục "Chụp ảnh" bên dưới để gửi ảnh nhận diện.
+    </p>
+    <div class="row">
+      <label>Kết quả gần nhất</label>
+      <div id="lastResult" class="note"></div>
+    </div>
+    <div class="row">
+      <video id="video" autoplay playsinline></video>
+    </div>
+    <div class="row">
+      <button id="startScanBtn" {% if not phone_enabled %}disabled{% endif %}>
+        Bật quét
+      </button>
+      <button
+        id="stopScanBtn"
+        {%
+        if
+        not
+        phone_enabled
+        %}disabled{%
+        endif
+        %}
+        style="margin-left: 8px"
+      >
+        Dừng
+      </button>
+      <span id="recMsg" class="note"></span>
+    </div>
+    <canvas id="canvas" style="display: none"></canvas>
+
+    <hr />
+    <h3>Chụp ảnh (fallback)</h3>
+    <p class="note">Dùng khi camera không mở do yêu cầu HTTPS.</p>
+    <div class="row">
+      <input
+        id="fileInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+      />
+      <button id="sendFileBtn">Gửi ảnh nhận diện</button>
+      <span id="fileMsg" class="note"></span>
+    </div>
+
+    <script>
+      const sessionId = {{ session[0] }};
+      const submitBtn = document.getElementById('submitBtn');
+      const submitMsg = document.getElementById('submitMsg');
+      submitBtn.onclick = async () => {
+        const studentId = document.getElementById('student').value;
+        const status = document.getElementById('status').value;
+        submitMsg.textContent = 'Đang gửi...';
+        try {
+          const r = await fetch('/attendance/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId, student_id: studentId, status })
+          });
+          const j = await r.json();
+          submitMsg.textContent = j.status === 'ok' ? 'Đã gửi' : ('Lỗi: ' + (j.message||'unknown'));
+          submitMsg.className = j.status === 'ok' ? 'note ok' : 'note err';
+        } catch (e) {
+          submitMsg.textContent = 'Lỗi mạng'; submitMsg.className = 'note err';
+        }
+      };
+
+      // Camera access
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const recMsg = document.getElementById('recMsg');
+      const lastResult = document.getElementById('lastResult');
+      async function initCamera() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          });
+          video.srcObject = stream;
+        } catch (e) {
+          recMsg.textContent = 'Không mở được camera: ' + e.message + ' — dùng mục Chụp ảnh (fallback)';
+          recMsg.className = 'note err';
+        }
+      }
+      initCamera();
+
+      // Quét liên tục: chụp khung hình định kỳ và gửi lên nhận diện (không cần nút chụp)
+      let scanning = false;
+      const TARGET_W = 720; // giảm kích thước gửi để nhanh hơn
+      const JPEG_Q = 0.82;  // chất lượng ảnh gửi
+      const INTERVAL_MS = 400; // ~2.5 khung/giây
+      async function scanOnce() {
+        if (!video.srcObject) { return; }
+        const vw = video.videoWidth || 640;
+        const vh = video.videoHeight || 480;
+        const scale = vw > TARGET_W ? (TARGET_W / vw) : 1.0;
+        const tw = Math.max(1, Math.round(vw * scale));
+        const th = Math.max(1, Math.round(vh * scale));
+        canvas.width = tw; canvas.height = th;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, tw, th);
+        const dataUrl = canvas.toDataURL('image/jpeg', JPEG_Q);
+        try {
+          const r = await fetch('/attendance/api/recognize_submit', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId, image: dataUrl })
+          });
+          const j = await r.json();
+          if (j.status === 'ok') {
+            const arr = Array.isArray(j.results) ? j.results : [];
+            if (arr.length > 0) {
+              const parts = arr.map(it => `${it.label} (${(it.confidence||0).toFixed(1)}%)`);
+              lastResult.textContent = parts.join(', ') + ' — đã gửi điểm danh';
+              lastResult.className = 'note ok';
+            } else {
+              // fallback to top-1 fields if provided
+              if (j.label && j.label !== 'Unknown') {
+                lastResult.textContent = `Nhãn: ${j.label} — ${j.confidence.toFixed(1)}% (đã gửi điểm danh)`;
+                lastResult.className = 'note ok';
+              } else {
+                lastResult.textContent = `Unknown`;
+                lastResult.className = 'note err';
+              }
+            }
+          } else {
+            lastResult.textContent = 'Lỗi: ' + (j.message||'unknown');
+            lastResult.className = 'note err';
+          }
+        } catch (e) {
+          lastResult.textContent = 'Lỗi mạng'; lastResult.className = 'note err';
+        }
+      }
+      async function scanLoop() {
+        if (!scanning) return;
+        await scanOnce();
+        setTimeout(scanLoop, INTERVAL_MS);
+      }
+      startScanBtn.onclick = () => {
+        if (!video.srcObject) { recMsg.textContent = 'Camera chưa mở'; recMsg.className = 'note err'; return; }
+        if (scanning) { return; }
+        scanning = true; recMsg.textContent = 'Đang quét...'; recMsg.className = 'note';
+        scanLoop();
+      };
+      stopScanBtn.onclick = () => {
+        scanning = false; recMsg.textContent = 'Đã dừng quét'; recMsg.className = 'note';
+      };
+
+      // Fallback: upload captured image file
+      const fileInput = document.getElementById('fileInput');
+      const sendFileBtn = document.getElementById('sendFileBtn');
+      const fileMsg = document.getElementById('fileMsg');
+      sendFileBtn.onclick = async () => {
+        if (!{{ 'true' if phone_enabled else 'false' }}) { fileMsg.textContent = 'Phone attendance disabled'; fileMsg.className = 'note err'; return; }
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) { fileMsg.textContent = 'Chưa chọn ảnh'; fileMsg.className = 'note err'; return; }
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const dataUrl = reader.result;
+          fileMsg.textContent = 'Đang nhận diện...';
+          try {
+            const r = await fetch('/attendance/api/recognize_submit', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ session_id: sessionId, image: dataUrl })
+            });
+            const j = await r.json();
+            if (j.status === 'ok') {
+              if (j.label && j.label !== 'Unknown') {
+                fileMsg.textContent = `Đã nhận diện: ${j.label} (độ tin cậy ${j.confidence.toFixed(1)}%)`;
+                fileMsg.className = 'note ok';
+              } else {
+                fileMsg.textContent = `Không nhận diện được (độ tin cậy ${j.confidence?.toFixed?.(1) || 0}%)`;
+                fileMsg.className = 'note err';
+              }
+            } else {
+              fileMsg.textContent = 'Lỗi: ' + (j.message||'unknown');
+              fileMsg.className = 'note err';
+            }
+          } catch (e) {
+            fileMsg.textContent = 'Lỗi mạng'; fileMsg.className = 'note err';
+          }
+        };
+        reader.readAsDataURL(f);
+      };
+    </script>
+  </body>
+</html>

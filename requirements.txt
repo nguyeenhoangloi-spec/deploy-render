@@ -1,0 +1,4 @@
+Flask
+waitress
+openpyxl
+psycopg2-binary

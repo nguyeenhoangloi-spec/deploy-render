@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng ký tài khoản</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* CSS Reset - Loại bỏ margin, padding mặc định và đặt box-sizing cho toàn bộ trang */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      /* Thiết lập body - Nền xanh dương chuyên nghiệp, căn giữa form đăng ký */
+      body {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      /* Container chính chứa form đăng ký - Nền trắng, bo góc, shadow chuyên nghiệp */
+      .login-container {
+        background-color: #ffffff;
+        padding: 45px;
+        border-radius: 20px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        max-width: 450px;
+      }
+      /* Tiêu đề "Đăng ký tài khoản" - Căn giữa, màu xanh đậm */
+      .login-container h2 {
+        text-align: center;
+        color: #1e40af;
+        margin-bottom: 10px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .register-subtitle {
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 30px;
+        font-weight: 400;
+      }
+      /* Style chung cho tất cả button - Chiều rộng 100%, bo góc, hiệu ứng hover */
+      .login-container button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-bottom: 12px;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      /* Nút "Đăng ký" - Xanh dương chuyên nghiệp, chữ trắng */
+      .register-btn {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: #fff;
+        margin-bottom: 0;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+      }
+      /* Hiệu ứng hover cho nút "Đăng ký" - Sáng hơn */
+      .register-btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+      }
+      /* Nút "Đăng nhập" - Viền xanh, nền trắng */
+      .back-btn {
+        background: white;
+        color: #1e40af;
+        border: 2px solid #1e40af;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.1);
+      }
+      /* Hiệu ứng hover cho nút "Đăng nhập" - Nền xanh nhạt */
+      .back-btn:hover {
+        background: #eff6ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+      }
+      /* Style cho tất cả input fields - Text, password, email, tel, select */
+      .login-container input[type="text"],
+      .login-container input[type="password"],
+      .login-container input[type="email"],
+      .login-container input[type="tel"],
+      .login-container select {
+        width: 100%;
+        padding: 13px;
+        margin-bottom: 16px;
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        outline: none;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .login-container input:focus,
+      .login-container select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      /* Style cho placeholder text trong input - Font nghiêng */
+      .login-container input[type="text"]::placeholder,
+      .login-container input[type="password"]::placeholder,
+      .login-container input[type="email"]::placeholder,
+      .login-container input[type="tel"]::placeholder {
+        font-style: italic;
+      }
+      /* Container chứa 2 nút - Flexbox, chia đều không gian */
+      .btn-group {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin-top: 16px;
+      }
+      /* Style cho button trong btn-group - Chia đều, không xuống hàng */
+      .btn-group button {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .home-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        z-index: 999;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        line-height: 1;
+      }
+      .home-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Container chính chứa toàn bộ form đăng ký -->
+    <a class="home-btn" href="{{ url_for('home.index') }}">
+      <i class="fas fa-home"></i> Trang chủ
+    </a>
+    <div class="login-container">
+      <!-- Tiêu đề trang -->
+      <h2><i class="fas fa-chalkboard-teacher"></i> Đăng ký tài khoản</h2>
+      <div class="register-subtitle">Tạo tài khoản giảng viên mới</div>
+      <!-- Thông báo thành công (hiển thị khi đăng ký thành công) -->
+      {% if message %}
+      <div style="color: green; text-align: center; margin-bottom: 16px">
+        {{ message }}
+      </div>
+      {% endif %}
+      <!-- Form đăng ký - Gửi dữ liệu POST đến register.index -->
+      <form action="{{ url_for('register.index') }}" method="POST">
+        <!-- Input họ tên - Bắt buộc, giữ lại giá trị khi có lỗi -->
+        <input
+          type="text"
+          name="fullname"
+          placeholder="👤 Họ tên đầy đủ"
+          required
+          value="{{ form_data.fullname }}"
+        />
+        <!-- Input email - Bắt buộc, validation email, giữ lại giá trị khi có lỗi -->
+        <input
+          type="email"
+          name="email"
+          placeholder="📧 Email"
+          required
+          value="{{ form_data.email }}"
+        />
+        <!-- Input số điện thoại - Bắt buộc, giữ lại giá trị khi có lỗi -->
+        <input
+          type="text"
+          name="phone"
+          placeholder="📱 Số điện thoại"
+          required
+          value="{{ form_data.phone }}"
+        />
+        <!-- Input tên đăng nhập - Bắt buộc, giữ lại giá trị khi có lỗi -->
+        <input
+          type="text"
+          name="username"
+          placeholder="👤 Tên đăng nhập"
+          required
+          value="{{ form_data.username }}"
+        />
+        <!-- Input mật khẩu - Bắt buộc, type password để ẩn text -->
+        <input
+          type="password"
+          name="password"
+          placeholder="🔒 Nhập mật khẩu"
+          required
+        />
+        <!-- Input xác nhận mật khẩu - Bắt buộc, để kiểm tra khớp với mật khẩu -->
+        <input
+          type="password"
+          name="confirm_password"
+          placeholder="🔒 Xác nhận mật khẩu"
+          required
+        />
+        <!-- Container chứa 2 nút action -->
+        <div class="btn-group">
+          <!-- Nút submit form đăng ký -->
+          <button type="submit" class="register-btn">
+            <i class="fas fa-user-plus"></i> Đăng ký
+          </button>
+          <!-- Nút chuyển về trang đăng nhập -->
+          <button
+            type="button"
+            class="back-btn"
+            onclick="window.location.href = '/login/'"
+          >
+            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

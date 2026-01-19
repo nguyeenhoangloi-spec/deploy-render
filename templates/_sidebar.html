@@ -1,0 +1,107 @@
+<!-- Sidebar Navigation Component -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="{{ url_for('dashboard.index') }}" class="logo">
+      <i class="fas fa-graduation-cap"></i>
+      <span>EduAttend</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Điểm danh</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a
+          href="{{ url_for('webcam.index') }}"
+          class="nav-link {% if request.endpoint == 'webcam.index' %}active{% endif %}"
+        >
+          <i class="fas fa-camera"></i>
+          <span>Webcam nhận diện</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('attendance.index') }}"
+          class="nav-link {% if request.endpoint and 'attendance' in request.endpoint %}active{% endif %}"
+        >
+          <i class="fas fa-calendar-check"></i>
+          <span>Buổi điểm danh</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Quản lý</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a
+          href="{{ url_for('students.index') }}"
+          class="nav-link {% if request.endpoint and 'students' in request.endpoint %}active{% endif %}"
+        >
+          <i class="fas fa-users"></i>
+          <span>Sinh viên</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('classes.index') }}"
+          class="nav-link {% if request.endpoint and 'classes' in request.endpoint %}active{% endif %}"
+        >
+          <i class="fas fa-school"></i>
+          <span>Lớp học</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('subjects.index') }}"
+          class="nav-link {% if request.endpoint and 'subjects' in request.endpoint %}active{% endif %}"
+        >
+          <i class="fas fa-book"></i>
+          <span>Môn học</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Công cụ</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a
+          href="{{ url_for('add_user.index') }}"
+          class="nav-link {% if request.endpoint and 'add_user' in request.endpoint %}active{% endif %}"
+        >
+          <i class="fas fa-user-plus"></i>
+          <span>Thêm người dùng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('settings.index') }}"
+          class="nav-link {% if request.endpoint == 'settings.index' %}active{% endif %}"
+        >
+          <i class="fas fa-cog"></i>
+          <span>Cấu hình</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="user-details">
+        <div class="user-name">{{ session.username or 'User' }}</div>
+        <div class="user-role">Giảng viên</div>
+      </div>
+    </div>
+    <form action="{{ url_for('logout.index') }}" method="get" style="margin: 0">
+      <button type="submit" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+      </button>
+    </form>
+  </div>
+</div>

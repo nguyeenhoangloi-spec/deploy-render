@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gán giảng viên cho lớp - EduAttend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .assignment-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .class-info {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .class-info i {
+        font-size: 24px;
+      }
+      .class-info-text h3 {
+        margin: 0 0 5px 0;
+        font-size: 18px;
+      }
+      .class-info-text p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 25px 0 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-title i {
+        color: #3b82f6;
+      }
+      .note {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      .lecturers-list {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 25px;
+      }
+      .lecturer-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.2s ease;
+      }
+      .lecturer-item:last-child {
+        border-bottom: none;
+      }
+      .lecturer-item:hover {
+        background: #f8fafc;
+      }
+      .lecturer-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      .lecturer-item label {
+        cursor: pointer;
+        flex: 1;
+        margin: 0;
+        font-size: 15px;
+        color: #334155;
+      }
+      .subject-assignment {
+        border-top: 1px dashed #e5e7eb;
+        padding-top: 15px;
+        margin-top: 15px;
+      }
+      .lecturer-section {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      .lecturer-section:last-child {
+        margin-bottom: 0;
+      }
+      .lecturer-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .lecturer-name i {
+        color: #3b82f6;
+        font-size: 16px;
+      }
+      .subject-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .subject-tag {
+        border: 2px solid #e5e7eb;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: white;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .subject-tag:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+      }
+      .subject-tag input[type="checkbox"] {
+        cursor: pointer;
+      }
+      .subject-tag label {
+        cursor: pointer;
+        margin: 0;
+        font-size: 14px;
+        color: #334155;
+      }
+      .warning-box {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        color: #92400e;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .warning-box i {
+        font-size: 20px;
+      }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 25px;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">Gán giảng viên cho lớp</h2>
+        <a href="{{ url_for('classes.index') }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="assignment-card">
+          <div class="class-info">
+            <i class="fas fa-users"></i>
+            <div class="class-info-text">
+              <h3>{{ cls[1] }}</h3>
+              <p>{{ cls[2] }}</p>
+            </div>
+          </div>
+
+          <form method="post">
+            <h3 class="section-title">
+              <i class="fas fa-chalkboard-teacher"></i>
+              Chọn giảng viên quản lý lớp
+            </h3>
+            <div class="note">
+              Chọn một hoặc nhiều giảng viên quản lý lớp này.
+            </div>
+
+            <div class="lecturers-list">
+              {% for u in lecturers %}
+              <div class="lecturer-item">
+                <input
+                  type="checkbox"
+                  id="lecturer_{{ u[0] }}"
+                  name="user_ids"
+                  value="{{ u[0] }}"
+                  {%
+                  if
+                  u[0]
+                  in
+                  selected_ids
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label for="lecturer_{{ u[0] }}">
+                  {{ u[1] or u[2] or ('#' ~ u[0]) }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+
+            {% if subjects %}
+            <div class="subject-assignment">
+              <h3 class="section-title">
+                <i class="fas fa-book-reader"></i>
+                Phân môn cho từng giảng viên
+              </h3>
+              <div class="note">
+                Gán môn học cụ thể cho từng giảng viên trong lớp này.
+              </div>
+
+              {% for u in lecturers %}
+              <div class="lecturer-section">
+                <div class="lecturer-name">
+                  <i class="fas fa-user"></i>
+                  {{ u[1] or u[2] or ('#' ~ u[0]) }}
+                </div>
+                <div class="subject-tags">
+                  {% for s in subjects %}
+                  <div class="subject-tag">
+                    <input
+                      type="checkbox"
+                      id="assign_{{ u[0] }}_{{ s[0] }}"
+                      name="assign_{{ u[0] }}"
+                      value="{{ s[0] }}"
+                      {%
+                      if
+                      ics_map
+                      and
+                      ics_map.get(u[0])
+                      and
+                      (s[0]
+                      in
+                      ics_map.get(u[0]))
+                      %}checked{%
+                      endif
+                      %}
+                    />
+                    <label for="assign_{{ u[0] }}_{{ s[0] }}">
+                      {{ s[1] }} — {{ s[2] }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="warning-box">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                Lớp này chưa được gán môn học. Vào mục
+                <strong>"Môn học"</strong> của lớp để gán trước.
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu gán
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

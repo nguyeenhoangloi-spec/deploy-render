@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tạo buổi học - EduAttend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        max-width: 700px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+        margin-bottom: 8px;
+      }
+      .form-group label i {
+        color: #3b82f6;
+        width: 20px;
+      }
+      .form-group select,
+      .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .form-group select:focus,
+      .form-group input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">Tạo buổi học</h2>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="form-card">
+          <form method="post">
+            <div class="form-group">
+              <label>
+                <i class="fas fa-users"></i>
+                Lớp
+              </label>
+              <select name="class_id" required>
+                {% for c in classes %}
+                <option value="{{ c[0] }}">{{ c[1] }} - {{ c[2] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-book"></i>
+                Môn học
+              </label>
+              <select name="subject_id" required>
+                {% for s in subjects %}
+                <option value="{{ s[0] }}">{{ s[1] }} - {{ s[2] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-calendar"></i>
+                Ngày học
+              </label>
+              <input type="date" name="session_date" required />
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-clock"></i>
+                Ca học
+              </label>
+              <input name="time_slot" placeholder="Ví dụ: Sáng" />
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-door-open"></i>
+                Phòng học
+              </label>
+              <input name="room" placeholder="Ví dụ: A101" />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tạo
+              </button>
+              <a
+                href="{{ url_for('attendance.index') }}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-times"></i> Quay lại
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chụp ảnh sinh viên - EduAttend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .search-section {
+        margin-bottom: 20px;
+      }
+
+      .search-box {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        margin-top: 15px;
+      }
+
+      .search-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+        width: 100%;
+        justify-content: center;
+      }
+
+      .btn-success:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+      }
+
+      .btn-secondary {
+        background: #64748b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .student-select-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .student-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .student-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .student-select option {
+        padding: 10px;
+      }
+
+      .info-banner {
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        padding: 16px;
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: start;
+        gap: 12px;
+      }
+
+      .info-banner i {
+        color: #3b82f6;
+        font-size: 18px;
+        margin-top: 2px;
+      }
+
+      .info-banner-content h4 {
+        color: #1e40af;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .info-banner-content p {
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .camera-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        display: none;
+        margin-top: 25px;
+      }
+
+      .camera-card.active {
+        display: block;
+      }
+
+      .camera-header {
+        margin-bottom: 20px;
+      }
+
+      .camera-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .camera-header h3 i {
+        color: #3b82f6;
+      }
+
+      .camera-hint {
+        color: #64748b;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .video-wrapper {
+        display: inline-block;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        margin-bottom: 25px;
+        background: #f0f0f0;
+      }
+
+      #videoStream {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .camera-controls {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .status-alert {
+        margin-top: 20px;
+        padding: 16px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        display: none;
+        animation: slideDown 0.3s ease;
+      }
+
+      .status-alert.show {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .status-alert i {
+        font-size: 18px;
+      }
+
+      .status-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+      }
+
+      .status-error {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .loading-state {
+        text-align: center;
+        padding: 20px;
+        color: #64748b;
+      }
+
+      .loading-state i {
+        font-size: 24px;
+        color: #3b82f6;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">
+          <i class="fas fa-camera"></i> Chụp ảnh sinh viên
+        </h2>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-user-graduate"></i> Chọn sinh viên để chụp ảnh
+            </h3>
+          </div>
+          <div class="card-body">
+            <form id="captureForm">
+              <div class="search-box">
+                <input
+                  id="studentSearch"
+                  type="text"
+                  class="search-input"
+                  placeholder="Tìm kiếm sinh viên..."
+                />
+                <button
+                  type="button"
+                  id="loadStudentsBtn"
+                  class="btn btn-primary"
+                >
+                  <i class="fas fa-search"></i> Tìm
+                </button>
+              </div>
+
+              <select id="studentSelect" class="student-select">
+                <option disabled selected>Đang tải danh sách...</option>
+              </select>
+
+              <button
+                type="button"
+                id="startByStudentBtn"
+                class="btn btn-success"
+              >
+                <i class="fas fa-camera"></i> Bắt đầu chụp ảnh
+              </button>
+
+              <div id="statusMessage" class="status-alert"></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="camera-card" id="cameraSection">
+          <div class="camera-header">
+            <h3><i class="fas fa-video"></i> Camera đang hoạt động</h3>
+            <p class="camera-hint">
+              <i class="fas fa-info-circle"></i>
+              Đảm bảo khuôn mặt hiện rõ ràng trong khung hình
+            </p>
+          </div>
+
+          <div class="video-wrapper">
+            <img
+              id="videoStream"
+              src=""
+              width="640"
+              height="480"
+              alt="Video stream"
+            />
+          </div>
+
+          <div class="camera-controls">
+            <button id="stopBtn" class="btn btn-success">
+              <i class="fas fa-check-circle"></i> Lưu và hoàn thành
+            </button>
+            <button
+              onclick="window.location.reload()"
+              class="btn btn-secondary"
+            >
+              <i class="fas fa-redo"></i> Làm lại
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const cameraSection = document.getElementById("cameraSection");
+      const stream = document.getElementById("videoStream");
+      const stopBtn = document.getElementById("stopBtn");
+      const studentSearch = document.getElementById("studentSearch");
+      const loadStudentsBtn = document.getElementById("loadStudentsBtn");
+      const studentSelect = document.getElementById("studentSelect");
+      const startByStudentBtn = document.getElementById("startByStudentBtn");
+      const statusMessage = document.getElementById("statusMessage");
+
+      // Tự động tải danh sách sinh viên khi trang load
+      window.addEventListener("DOMContentLoaded", () => {
+        loadStudents("");
+      });
+
+      function showStatus(message, type) {
+        statusMessage.innerHTML = `<i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i> ${message}`;
+        statusMessage.className = `status-alert status-${type} show`;
+        setTimeout(() => {
+          statusMessage.classList.remove("show");
+        }, 5000);
+      }
+
+      stopBtn.addEventListener("click", async () => {
+        try {
+          await fetch("/add_user/capture/stop");
+          showStatus("Đã lưu thông tin thành công!", "success");
+
+          localStorage.removeItem("capture_fullname");
+          localStorage.removeItem("capture_classname");
+
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 2000);
+        } catch (error) {
+          showStatus("Lỗi khi lưu dữ liệu. Vui lòng thử lại!", "error");
+        }
+      });
+
+      async function loadStudents(query) {
+        try {
+          studentSelect.innerHTML =
+            "<option disabled selected>Đang tải...</option>";
+          const url = new URL(window.location.origin + "/students/api");
+          if (query) url.searchParams.set("q", query);
+          const res = await fetch(url);
+          const data = await res.json();
+          const rows = Array.isArray(data.rows) ? data.rows : [];
+
+          studentSelect.innerHTML =
+            "<option disabled selected>-- Chọn sinh viên --</option>";
+
+          rows.forEach((r) => {
+            const opt = document.createElement("option");
+            const cls = r[3] || "";
+            opt.value = r[0];
+            opt.textContent = `${r[2]}${cls ? " (" + cls + ")" : ""}`;
+            opt.dataset.fullname = r[2] || "";
+            opt.dataset.classcode = cls;
+            studentSelect.appendChild(opt);
+          });
+
+          if (rows.length > 0) {
+            showStatus(`Tìm thấy ${rows.length} sinh viên`, "success");
+          } else {
+            showStatus("Không tìm thấy sinh viên nào", "error");
+          }
+        } catch (e) {
+          showStatus("Không tải được danh sách sinh viên", "error");
+          studentSelect.innerHTML =
+            "<option disabled selected>Lỗi tải dữ liệu</option>";
+        }
+      }
+
+      loadStudentsBtn.addEventListener("click", () => {
+        loadStudents(studentSearch.value.trim());
+      });
+
+      studentSearch.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          loadStudentsBtn.click();
+        }
+      });
+
+      studentSearch.addEventListener("input", (e) => {
+        const q = e.target.value.trim();
+        if (q.length >= 2) {
+          loadStudents(q);
+        } else if (q.length === 0) {
+          loadStudents("");
+        }
+      });
+
+      studentSelect.addEventListener("change", () => {
+        const opt = studentSelect.selectedOptions[0];
+        if (!opt || opt.disabled) return;
+        const msg = `Đã chọn: ${opt.dataset.fullname}${opt.dataset.classcode ? " (" + opt.dataset.classcode + ")" : ""}`;
+        showStatus(msg, "success");
+      });
+
+      startByStudentBtn.addEventListener("click", async () => {
+        const opt = studentSelect.selectedOptions[0];
+        if (!opt || opt.disabled) {
+          showStatus("Vui lòng chọn sinh viên trước", "error");
+          return;
+        }
+
+        try {
+          const body = new URLSearchParams({ student_id: opt.value });
+          const res = await fetch("/add_user/capture/start_by_student", {
+            method: "POST",
+            body,
+          });
+
+          if (res.ok) {
+            cameraSection.classList.add("active");
+            stream.src = "/add_user/capture/video";
+            showStatus("Camera đã khởi động thành công", "success");
+            setTimeout(() => {
+              cameraSection.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }, 300);
+          } else {
+            const errorText = await res.text();
+            showStatus(errorText || "Lỗi khi khởi động camera", "error");
+          }
+        } catch (e) {
+          showStatus("Lỗi kết nối khi bắt đầu chụp", "error");
+        }
+      });
+    </script>
+  </body>
+</html>

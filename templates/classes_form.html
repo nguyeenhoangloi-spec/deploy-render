@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      {% if form.id %}Sửa lớp{% else %}Thêm lớp{% endif %} - EduAttend
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        max-width: 600px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+        margin-bottom: 8px;
+      }
+      .form-group label i {
+        color: #3b82f6;
+        width: 20px;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .form-group input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">
+          {% if form.id %}Sửa lớp{% else %}Thêm lớp{% endif %}
+        </h2>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="form-card">
+          <form method="post">
+            <div class="form-group">
+              <label>
+                <i class="fas fa-hashtag"></i>
+                Mã lớp
+              </label>
+              <input
+                name="code"
+                value="{{ form.code or '' }}"
+                required
+                placeholder="Ví dụ: CNTT01"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-users"></i>
+                Tên lớp
+              </label>
+              <input
+                name="name"
+                value="{{ form.name or '' }}"
+                required
+                placeholder="Ví dụ: Công nghệ thông tin 01"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu
+              </button>
+              <a
+                href="{{ url_for('classes.index') }}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-times"></i> Quay lại
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

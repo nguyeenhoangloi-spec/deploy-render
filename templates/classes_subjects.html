@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Gán môn học cho lớp - EduAttend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .assignment-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .class-info {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .class-info i {
+        font-size: 24px;
+      }
+      .class-info-text h3 {
+        margin: 0 0 5px 0;
+        font-size: 18px;
+      }
+      .class-info-text p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+      }
+      .subjects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+      .subject-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .subject-card:hover {
+        border-color: #3b82f6;
+        background: #f8fafc;
+      }
+      .subject-card.selected {
+        border-color: #3b82f6;
+        background: #eff6ff;
+      }
+      .subject-card label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        margin: 0;
+      }
+      .subject-card input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      .subject-content {
+        flex: 1;
+      }
+      .subject-code {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .subject-name {
+        color: #64748b;
+        font-size: 13px;
+      }
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">Gán môn học cho lớp</h2>
+        <a href="{{ url_for('classes.index') }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="assignment-card">
+          <div class="class-info">
+            <i class="fas fa-users"></i>
+            <div class="class-info-text">
+              <h3>{{ cls[1] }}</h3>
+              <p>{{ cls[2] }}</p>
+            </div>
+          </div>
+
+          <form method="post">
+            <div class="subjects-grid">
+              {% for s in subjects %}
+              <div
+                class="subject-card"
+                onclick="
+                  this.querySelector('input').click();
+                  event.stopPropagation();
+                "
+              >
+                <label onclick="event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    name="subject_ids"
+                    value="{{ s[0] }}"
+                    {%
+                    if
+                    s[0]
+                    in
+                    selected_ids
+                    %}checked{%
+                    endif
+                    %}
+                    onchange="
+                      this.closest('.subject-card').classList.toggle(
+                        'selected',
+                        this.checked,
+                      )
+                    "
+                  />
+                  <div class="subject-content">
+                    <div class="subject-code">{{ s[1] }}</div>
+                    <div class="subject-name">{{ s[2] }}</div>
+                  </div>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu thay đổi
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Initialize selected state
+      document
+        .querySelectorAll('.subject-card input[type="checkbox"]')
+        .forEach((checkbox) => {
+          if (checkbox.checked) {
+            checkbox.closest(".subject-card").classList.add("selected");
+          }
+        });
+    </script>
+  </body>
+</html>

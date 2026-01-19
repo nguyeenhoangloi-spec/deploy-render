@@ -1,0 +1,760 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Webcam nhận diện - EduAttend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% include '_sidebar_styles.html' %}
+    <style>
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+      }
+
+      .btn-secondary {
+        background: #64748b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .status-active {
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+      }
+
+      .status-inactive {
+        background: #ef4444;
+      }
+
+      .webcam-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+      }
+
+      .video-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        text-align: center;
+      }
+
+      .video-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .video-card h3 i {
+        color: #3b82f6;
+      }
+
+      #video {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background: #f0f0f0;
+      }
+
+      .loading-indicator {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: #fef3c7;
+        border-radius: 8px;
+        color: #92400e;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .loading-indicator.active {
+        display: block;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid #fbbf24;
+        border-top: 3px solid #92400e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .video-status {
+        margin-top: 15px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #64748b;
+        text-align: center;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        max-height: 600px;
+      }
+
+      .info-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .info-card h3 i {
+        color: #3b82f6;
+      }
+
+      #person-info {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+      }
+
+      .info-item {
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .info-label i {
+        color: #3b82f6;
+        font-size: 12px;
+      }
+
+      .info-value {
+        color: #1e293b;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .confidence-bar {
+        background: #e0e0e0;
+        border-radius: 10px;
+        height: 8px;
+        margin-top: 8px;
+      }
+
+      .confidence-fill {
+        background: linear-gradient(90deg, #3b82f6, #1e40af);
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+      }
+
+      #no-person {
+        color: #94a3b8;
+        font-style: italic;
+        text-align: center;
+        padding: 40px 20px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 2px dashed #cbd5e1;
+      }
+
+      #no-person i {
+        font-size: 48px;
+        color: #cbd5e1;
+        display: block;
+        margin-bottom: 15px;
+      }
+
+      .attendance-section {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 15px;
+      }
+
+      .attendance-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .attendance-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .attendance-counter {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      #attendance-list {
+        max-height: 180px;
+        overflow-y: auto;
+        background: #f8fafc;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      .attendance-item {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .attendance-item:last-child {
+        border-bottom: none;
+      }
+
+      .attendance-number {
+        color: #3b82f6;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .notification {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+      }
+
+      .notification.show {
+        display: block;
+      }
+
+      .notification.error {
+        border-left: 4px solid #ef4444;
+      }
+
+      .notification.success {
+        border-left: 4px solid #10b981;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .webcam-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include '_sidebar.html' %}
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="page-title">Webcam nhận diện khuôn mặt</h2>
+      </div>
+
+      <div class="content-container">
+        {% include '_flash.html' %}
+
+        <div class="controls">
+          <button class="btn btn-secondary" id="backToSessionBtn" disabled>
+            <i class="fas fa-arrow-left"></i>
+            Quay về
+          </button>
+          <button class="btn btn-primary" id="startBtn" onclick="startWebcam()">
+            <span class="status-indicator status-inactive"></span>
+            Bắt đầu nhận diện
+          </button>
+          <button class="btn btn-danger" id="stopBtn" onclick="stopWebcam()">
+            <i class="fas fa-stop"></i>
+            Dừng camera
+          </button>
+          <button
+            class="btn btn-secondary"
+            id="reloadBtn"
+            onclick="reloadWebcam()"
+          >
+            <i class="fas fa-sync-alt"></i> Làm mới
+          </button>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <div class="webcam-grid">
+          <div class="video-card">
+            <h3><i class="fas fa-camera"></i> Camera</h3>
+            <img
+              id="video"
+              width="640"
+              height="480"
+              alt="Video feed sẽ hiển thị tại đây"
+            />
+            <div class="loading-indicator" id="loadingIndicator">
+              <span class="loading-spinner"></span>
+              Đang khởi động camera, vui lòng chờ...
+            </div>
+            <div class="video-status">
+              <i class="fas fa-info-circle"></i> Hướng dẫn: Nhấn "Bắt đầu nhận
+              diện" để khởi động camera. Đưa khuôn mặt vào khung hình để hệ
+              thống nhận diện.
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3><i class="fas fa-user"></i> Thông tin nhận diện</h3>
+            <div id="person-info">
+              <div id="no-person">
+                <i class="fas fa-camera"></i>
+                Camera chưa khởi động<br /><small
+                  >Nhấn "Bắt đầu nhận diện" để bắt đầu</small
+                >
+              </div>
+            </div>
+
+            <div class="attendance-section">
+              <div class="attendance-header">
+                <div class="attendance-title">
+                  <i class="fas fa-clipboard-list"></i> Đã điểm danh
+                </div>
+                <span class="attendance-counter" id="attendanceCounter"
+                  >0 người</span
+                >
+              </div>
+              <div id="attendance-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script id="sessionJson" type="application/json">
+      {{ session_id | tojson }}
+    </script>
+
+    <script>
+      // Nhận sessionId từ server (có thể null nếu mở độc lập)
+      const sessionJsonEl = document.getElementById("sessionJson");
+      const sessionId = sessionJsonEl
+        ? JSON.parse(sessionJsonEl.textContent)
+        : null;
+      let infoInterval = null;
+      let isActive = false;
+
+      // Wire back-to-session button
+      (function () {
+        const backBtn = document.getElementById("backToSessionBtn");
+        if (!backBtn) return;
+        if (sessionId) {
+          backBtn.disabled = false;
+          backBtn.addEventListener("click", function () {
+            window.location.href = "/attendance/" + sessionId;
+          });
+        } else {
+          backBtn.title = "Không có phiên điểm danh hiện tại";
+        }
+      })();
+
+      // Hàm hiển thị notification
+      function showNotification(message, type = "error") {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.className = `notification ${type} show`;
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 3000);
+      }
+
+      function updateButtonStatus(active) {
+        isActive = active;
+        const startBtn = document.getElementById("startBtn");
+        const stopBtn = document.getElementById("stopBtn");
+
+        const startIndicator = startBtn.querySelector(".status-indicator");
+
+        if (active) {
+          startIndicator.className = "status-indicator status-active";
+          startBtn.innerHTML =
+            '<span class="status-indicator status-active"></span> Camera đang hoạt động';
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+        } else {
+          startIndicator.className = "status-indicator status-inactive";
+          startBtn.innerHTML =
+            '<span class="status-indicator status-inactive"></span> Bắt đầu nhận diện';
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        }
+      }
+
+      function showLoading(show) {
+        const loader = document.getElementById("loadingIndicator");
+        if (show) {
+          loader.classList.add("active");
+        } else {
+          loader.classList.remove("active");
+        }
+      }
+
+      function startWebcam() {
+        if (isActive) return;
+
+        showLoading(true);
+        document.getElementById("startBtn").disabled = true;
+
+        fetch("/webcam/start?mirror=0")
+          .then((response) => response.text())
+          .then((data) => {
+            showLoading(false);
+            if (data === "Started") {
+              document.getElementById("video").src = "/webcam/video_feed";
+              updateButtonStatus(true);
+              updatePersonInfo();
+              infoInterval = setInterval(updatePersonInfo, 1000);
+            } else {
+              showNotification("Lỗi khởi động camera", "error");
+              document.getElementById("startBtn").disabled = false;
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showLoading(false);
+            showNotification("Không thể kết nối đến camera", "error");
+            document.getElementById("startBtn").disabled = false;
+          });
+      }
+
+      function stopWebcam() {
+        fetch("/webcam/stop")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("video").src = "";
+            updateButtonStatus(false);
+
+            if (infoInterval) {
+              clearInterval(infoInterval);
+              infoInterval = null;
+            }
+
+            document.getElementById("person-info").innerHTML =
+              '<div id="no-person"><i class="fas fa-camera"></i> Camera đã tắt<br><small>Nhấn "Bắt đầu nhận diện" để bắt đầu lại</small></div>';
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Sửa hàm reloadWebcam để gọi API reload trước khi reload trang
+      function reloadWebcam() {
+        fetch("/webcam/reload", { method: "POST" })
+          .then(() => fetch("/webcam/stop"))
+          .then(() => location.reload());
+      }
+
+      const attendanceSet = new Set();
+
+      function resetAttendance() {
+        attendanceSet.clear();
+        updateAttendanceCounter();
+        document.getElementById("attendance-list").innerHTML =
+          "<div class='empty-attendance'><i class='fas fa-user-slash'></i> Chưa có ai được điểm danh</div>";
+        showNotification("Đã xóa danh sách điểm danh", "success");
+      }
+
+      function exportAttendance() {
+        if (attendanceSet.size === 0) {
+          showNotification("Chưa có ai được điểm danh", "error");
+          return;
+        }
+
+        // Chuyển Set thành Array và gửi lên server
+        const labels = Array.from(attendanceSet);
+        const form = document.createElement("form");
+        form.method = "POST";
+        // Xuất theo buổi học không còn dùng history; ẩn nút hoặc xử lý phía client
+        showNotification(
+          "Chức năng xuất webcam tạm thời không khả dụng.",
+          "error",
+        );
+        return;
+        form.target = "_blank";
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "labels";
+        input.value = JSON.stringify(labels);
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        showNotification("Đang xuất file Excel...", "success");
+      }
+
+      function updateAttendanceCounter() {
+        const counter = document.getElementById("attendanceCounter");
+        const count = attendanceSet.size;
+        counter.textContent = `${count} người`;
+      }
+
+      function postAttendance(label, confidence) {
+        if (!sessionId) return; // Không có phiên, bỏ qua
+        const payload = {
+          label,
+          status: "present",
+          confidence: confidence ?? null,
+        };
+        fetch(`/attendance/${sessionId}/mark_by_label`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch((e) => console.warn("mark_by_label error", e));
+      }
+
+      function updateAttendanceList(persons) {
+        persons.forEach((person) => {
+          if (person.label && person.label !== "Unknown") {
+            if (!attendanceSet.has(person.label)) {
+              attendanceSet.add(person.label);
+              // Gửi điểm danh lên server khi lần đầu thấy nhãn trong phiên
+              let confNum = undefined;
+              try {
+                if (typeof person.confidence === "string") {
+                  confNum = parseFloat(person.confidence.replace("%", ""));
+                } else if (typeof person.confidence === "number") {
+                  confNum = person.confidence;
+                }
+              } catch {}
+              postAttendance(person.label, confNum);
+            }
+          }
+        });
+
+        const html = Array.from(attendanceSet)
+          .map(
+            (label, idx) =>
+              `<div class='attendance-item'>
+                <span class='attendance-number'>${idx + 1}.</span>
+                <b>${label}</b>
+              </div>`,
+          )
+          .join("");
+        document.getElementById("attendance-list").innerHTML =
+          html ||
+          "<div class='empty-attendance'><i class='fas fa-user-slash'></i> Chưa có ai được điểm danh</div>";
+        updateAttendanceCounter();
+      }
+
+      // Lưu thông tin chi tiết của từng người đã nhận diện cho cả phần person-info
+      const personInfoMap = new Map();
+      function updatePersonInfo() {
+        fetch("/webcam/get_person_info")
+          .then((response) => response.json())
+          .then((data) => {
+            if (Array.isArray(data) && data.length > 0) {
+              data.forEach((person) => {
+                if (person.label && person.label !== "Unknown") {
+                  if (!personInfoMap.has(person.label)) {
+                    personInfoMap.set(person.label, person);
+                  } else {
+                    // Nếu đã có, chỉ cập nhật thời gian và độ tin cậy mới nhất
+                    const old = personInfoMap.get(person.label);
+                    personInfoMap.set(person.label, { ...old, ...person });
+                  }
+                }
+              });
+            }
+            const infoDiv = document.getElementById("person-info");
+            if (personInfoMap.size > 0) {
+              infoDiv.innerHTML = Array.from(personInfoMap.values())
+                .map((person, idx) => {
+                  const confidence = parseFloat(
+                    person.confidence.replace("%", ""),
+                  );
+                  return `
+                    <div class="info-item">
+                      <div class="info-row">
+                        <span class="info-label">${
+                          idx + 1
+                        }. <i class="fas fa-user"></i> Họ tên:</span>
+                        <span class="info-value">${person.fullname}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label"><i class="fas fa-graduation-cap"></i> Lớp:</span>
+                        <span class="info-value">${
+                          person.classname || ""
+                        }</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label"><i class="fas fa-id-card"></i> Mã ID:</span>
+                        <span class="info-value">${person.label}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label"><i class="fas fa-file-alt"></i> Mô tả:</span>
+                        <span class="info-value">${person.desc}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label"><i class="fas fa-chart-bar"></i> Độ tin cậy:</span>
+                        <span class="info-value">${person.confidence}</span>
+                      </div>
+                      <div class="confidence-bar">
+                        <div class="confidence-fill" style="--confidence-width: ${confidence}%"></div>
+                      </div>
+                      <div class="info-row info-row-margin">
+                        <span class="info-label"><i class="fas fa-clock"></i> Thời gian:</span>
+                        <span class="info-value">${person.time}</span>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("");
+            } else {
+              infoDiv.innerHTML =
+                '<div id="no-person"><i class="fas fa-search"></i> Đang tìm kiếm...<br><small>Hãy di chuyển vào khung hình</small></div>';
+            }
+            updateAttendanceList(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("person-info").innerHTML =
+              '<div id="no-person"><i class="fas fa-exclamation-triangle"></i> Lỗi kết nối<br><small>Không thể lấy thông tin nhận diện</small></div>';
+          });
+      }
+
+      // Gọi API reload khi trang vừa load
+      window.addEventListener("DOMContentLoaded", function () {
+        fetch("/webcam/reload", { method: "POST" });
+      });
+
+      // Khởi tạo trạng thái ban đầu
+      updateButtonStatus(false);
+    </script>
+  </body>
+</html>

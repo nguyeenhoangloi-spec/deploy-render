@@ -2,3 +2,9 @@ Flask
 waitress
 openpyxl
 psycopg2-binary
+qrcode
+numpy
+opencv-python
+face_recognition
+ultralytics
+Werkzeug
